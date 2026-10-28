@@ -20,29 +20,20 @@ import { Link } from "react-router-dom";
 
 const Allresumes = () => {
   const [resumeData, setResumeData] = useState([]);
-  const [duplicateData, setDuplicateData] = useState([]);
   const [searchVal, setSearchVal] = useState("");
-
-  useEffect(() => {
-    getResumeDatas();
-  }, []);
 
   const getResumeDatas = async () => {
     try {
       const response = await getResumes();
       setResumeData(response.data);
-      setDuplicateData(response.data);
     } catch (error) {
       toast.error("Failed to get resumes");
     }
   };
 
   useEffect(() => {
-    const filteredData = duplicateData.filter((item) =>
-      item.jobTitle?.toLowerCase().includes(searchVal.toLowerCase())
-    );
-    setResumeData(filteredData);
-  }, [searchVal, duplicateData]);
+    getResumeDatas();
+  }, []);
 
   const onDeleteClick = async (id) => {
     try {
@@ -51,157 +42,91 @@ const Allresumes = () => {
       if (response.status === 200) {
         toast.success("Resume deleted successfully");
         getResumeDatas();
-      } else {
-        toast.error("Failed to delete resume");
       }
     } catch (error) {
       toast.error("Failed to delete resume");
     }
   };
 
+  const filteredData = resumeData.filter((item) =>
+    item.jobTitle?.toLowerCase().includes(searchVal.toLowerCase())
+  );
+
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f5f7fb", p: { xs: 2, md: 5 } }}>
-      <Box sx={{ maxWidth: "1100px", mx: "auto" }}>
+    <Box sx={{ p: 3, maxWidth: 1000, mx: "auto" }}>
+      <Typography variant="h5" fontWeight="bold" mb={1}>
+        All Saved Resumes
+      </Typography>
 
-        <Typography
-          variant="h4"
-          sx={{ fontWeight: "bold", color: "#00030a", mb: 1 }}
-        >
-          All Saved Resumes
-        </Typography>
+      <Typography color="text.secondary" mb={3}>
+        Search and manage your saved resumes.
+      </Typography>
 
-        <Typography sx={{ color: "#64748b", mb: 4 }}>
-          Manage, search and view all candidate resumes in one place.
-        </Typography>
+      <TextField
+        fullWidth
+        size="small"
+        placeholder="Search by job role..."
+        value={searchVal}
+        onChange={(e) => setSearchVal(e.target.value)}
+        sx={{ mb: 3 }}
+      />
 
-        <Paper
-          elevation={0}
-          sx={{
-            p: 3,
-            mb: 3,
-            borderRadius: 3,
-            border: "1px solid #e2e8f0",
-          }}
-        >
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="Search by job role..."
-            value={searchVal}
-            onChange={(e) => setSearchVal(e.target.value)}
-          />
-        </Paper>
+      <TableContainer component={Paper} elevation={1}>
+        <Table>
+          <TableHead>
+            <TableRow sx={{ bgcolor: "#1976d2" }}>
+              <TableCell sx={{ color: "white" }}>No.</TableCell>
+              <TableCell sx={{ color: "white" }}>Candidate Name</TableCell>
+              <TableCell sx={{ color: "white" }}>Job Role</TableCell>
+              <TableCell sx={{ color: "white" }} align="center">
+                Actions
+              </TableCell>
+            </TableRow>
+          </TableHead>
 
-        <TableContainer
-          component={Paper}
-          elevation={0}
-          sx={{
-            borderRadius: 3,
-            border: "1px solid #e2e8f0",
-            overflowX: "auto",
-          }}
-        >
-          <Table>
-            <TableHead>
-              <TableRow sx={{ bgcolor: "#172554" }}>
-                <TableCell sx={{ color: "white", fontWeight: "bold" }}>
-                  #
-                </TableCell>
-                <TableCell sx={{ color: "white", fontWeight: "bold" }}>
-                  Candidate Name
-                </TableCell>
-                <TableCell sx={{ color: "white", fontWeight: "bold" }}>
-                  Job Role
-                </TableCell>
-                <TableCell
-                  align="center"
-                  sx={{ color: "white", fontWeight: "bold" }}
-                >
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
+          <TableBody>
+            {filteredData.length > 0 ? (
+              filteredData.map((item, index) => (
+                <TableRow key={item.id} hover>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{item.fullName}</TableCell>
+                  <TableCell>{item.jobTitle}</TableCell>
+                  <TableCell align="center">
+                    <Button
+                      component={Link}
+                      to={`/resumes/${item.id}`}
+                      variant="contained"
+                      size="small"
+                      sx={{ mr: 1, textTransform: "none" }}
+                    >
+                      Show Details
+                    </Button>
 
-            <TableBody>
-              {resumeData.length > 0 ? (
-                resumeData.map((item, index) => (
-                  <TableRow
-                    key={item.id}
-                    hover
-                    sx={{
-                      "&:nth-of-type(even)": { bgcolor: "#f8fafc" },
-                      "&:last-child td": { border: 0 },
-                    }}
-                  >
-                    <TableCell>{index + 1}</TableCell>
-
-                    <TableCell sx={{ fontWeight: 600, color: "#334155" }}>
-                      {item.fullName}
-                    </TableCell>
-
-                    <TableCell>
-                      <Box
-                        sx={{
-                          display: "inline-block",
-                          bgcolor: "#dbeafe",
-                          color: "#1d4ed8",
-                          px: 1.5,
-                          py: 0.5,
-                          borderRadius: 2,
-                          fontSize: 13,
-                        }}
-                      >
-                        {item.jobTitle}
-                      </Box>
-                    </TableCell>
-
-                    <TableCell align="center">
-                      <Button
-                        component={Link}
-                        to={`/resumes/${item.id}`}
-                        variant="contained"
-                        size="small"
-                        sx={{
-                          textTransform: "none",
-                          bgcolor: "#2563eb",
-                          mr: 1,
-                          "&:hover": { bgcolor: "#1d4ed8" },
-                        }}
-                      >
-                        Show Details
-                      </Button>
-
-                      <Button
-                        onClick={() => onDeleteClick(item.id)}
-                        color="error"
-                        variant="outlined"
-                        size="small"
-                        sx={{ minWidth: 40 }}
-                      >
-                        <BiTrash size={18} />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={4} align="center" sx={{ py: 5 }}>
-                    <Typography color="text.secondary">
-                      No resumes found
-                    </Typography>
+                    <Button
+                      onClick={() => onDeleteClick(item.id)}
+                      color="error"
+                      variant="outlined"
+                      size="small"
+                    >
+                      <BiTrash size={18} />
+                    </Button>
                   </TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  No resumes found
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-        <Typography
-          sx={{ mt: 2, color: "#64748b", fontSize: 14 }}
-        >
-          Total resumes: {resumeData.length}
-        </Typography>
-      </Box>
+      <Typography mt={2} color="text.secondary">
+        Total resumes: {filteredData.length}
+      </Typography>
     </Box>
   );
 };
