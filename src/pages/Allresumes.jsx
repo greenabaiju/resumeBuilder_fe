@@ -41,6 +41,7 @@ const Allresumes = () => {
       let apiResponse = await deleteResume(id);
       if (apiResponse.status == 200) {
         toast.success("successfully deleted");
+        getResumeDatas()
       } else {
         toast.error("Failed");
       }
