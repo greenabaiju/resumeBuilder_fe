@@ -65,7 +65,7 @@ const Allresumes = () => {
 
         <Typography
           variant="h4"
-          sx={{ fontWeight: "bold", color: "#172554", mb: 1 }}
+          sx={{ fontWeight: "bold", color: "#00030a", mb: 1 }}
         >
           All Saved Resumes
         </Typography>
