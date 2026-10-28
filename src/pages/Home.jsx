@@ -7,10 +7,12 @@ import aboutimg from "../assets/resume.png";
 import Stack from "@mui/material/Stack";
 import team from "../assets/team.png";
 import Grid from "@mui/material/Grid";
-import grid1 from "../assets/grid1.png";
-import grid2 from "../assets/grid2.png";
-import grid3 from "../assets/grid3.png";
-import grid7 from "../assets/grid7.png";
+import grid1 from "../assets/g1.avif";
+import grid2 from "../assets/g2.avif";
+import grid3 from "../assets/g3.avif";
+import grid4 from "../assets/g4.jpg";
+import grid5 from "../assets/g5.avif";
+import grid6 from "../assets/g6.jpg";
 import { Link } from "react-router-dom";
 
 const Home = () => {
@@ -120,67 +122,83 @@ const Home = () => {
         }}
       ></Box>
       {/* Grid */}
-      <Box sx={{ margin: "50px 200px" }}>
-        <Typography sx={{ margin: "40px", textAlign: "center" }} variant="h4">
-          Testimony
+      <Box sx={{ bgcolor: "#f8f6f3", py: 8, px: { xs: 2, md: 8 } }}>
+        <Typography
+          variant="h4"
+          sx={{ textAlign: "center", fontWeight: "bold", mb: 2 }}
+        >
+          What People Say
         </Typography>
-        <Grid container spacing={3}>
-          <Grid size={7}>
-            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-              Trusted by professionals worldwide.
+
+        <Typography
+          sx={{ textAlign: "center", color: "text.secondary", mb: 5 }}
+        >
+          Helping job seekers create professional resumes with ease.
+        </Typography>
+
+        <Grid container spacing={4} alignItems="center">
+          <Grid size={{ xs: 12, md: 5 }}>
+            <Typography variant="h5" fontWeight="bold" mb={2}>
+              Build Your Future With Confidence
             </Typography>
-            <Typography sx={{ marginTop: "10px" }}>
-              The system can suggest job-specific keywords, professional
-              summaries, and skill recommendations to make the resume more
-              effective and ATS (Applicant Tracking System) friendly.
-              <br />
-              <br />
-              The main goal of the AI rBuilder is to simplify the resume
-              creation process and help job seekers build professional,
-              well-structured resumes in a few minutes.
-              <br />
-              <br />
-              This type of system is especially useful for students & fresh
-              graduates, who want to create high-quality resumes that increase
-              their chances of getting shortlisted for job interviews.
+
+            <Typography color="text.secondary" lineHeight={1.9}>
+              Create a professional resume that highlights your skills,
+              experience, and achievements. Our AI Resume Builder helps
+              students, freshers, and professionals prepare job-ready resumes
+              quickly and easily.
             </Typography>
+
+            <Button
+              component={Link}
+              to="/resume"
+              variant="contained"
+              sx={{
+                mt: 3,
+                bgcolor: "#755846",
+                textTransform: "none",
+                px: 3,
+                py: 1,
+                "&:hover": { bgcolor: "#594131" },
+              }}
+            >
+              Create Your Resume
+            </Button>
           </Grid>
-          <Grid container size={5} spacing={2}>
-            <Grid size={3}>
-              <img src={grid1} />
-            </Grid>
-            <Grid size={3}>
-              <img src={grid2} />
-            </Grid>
-            <Grid size={3}>
-              <img src={grid3} />
-            </Grid>
-            <Grid size={3}>
-              <img src={grid7} />
-            </Grid>
-            <Grid size={3}>
-              <img src={grid1} />
-            </Grid>
-            <Grid size={3}>
-              <img src={grid2} />
-            </Grid>
-            <Grid size={3}>
-              <img src={grid3} />
-            </Grid>
-            <Grid size={3}>
-              <img src={grid7} />
-            </Grid>
-            <Grid size={3}>
-              <img src={grid1} />
-            </Grid>
-            <Grid size={3}>
-              <img src={grid2} />
-            </Grid>
-            <Grid size={3}>
-              <img src={grid3} />
-            </Grid>
-            <Grid size={3}>
-              <img src={grid7} />
+
+          <Grid size={{ xs: 12, md: 7 }}>
+            <Grid container spacing={2}>
+              {[grid1, grid2, grid3, grid4, grid5, grid6].map(
+                (img, index) => (
+                  <Grid size={{ xs: 4 }} key={index}>
+                    <Box
+                      sx={{
+                        bgcolor: "white",
+                        p: 1,
+                        borderRadius: 3,
+                        boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
+                        transition: "0.3s",
+                        "&:hover": {
+                          transform: "translateY(-5px)",
+                        },
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src={img}
+                        alt={`Professional ${index + 1}`}
+                        sx={{
+                          width: "100%",
+                          height: { xs: 100, md: 145 },
+                          objectFit: "cover",
+                          borderRadius: 2,
+                          display: "block",
+                        }}
+                      />
+                    </Box>
+                  </Grid>
+                )
+              )}
             </Grid>
           </Grid>
         </Grid>
