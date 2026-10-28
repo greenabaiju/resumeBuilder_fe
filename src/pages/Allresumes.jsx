@@ -1,157 +1,99 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Box, Typography, TextField,  } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+
+import React, { useEffect, useState } from "react";
+import { Box, Typography, TextField } from "@mui/material";
 import { BiTrash } from "react-icons/bi";
 import { toast } from "react-toastify";
 import { deleteResume, getResumes } from "../services/allApi";
 import { Link } from "react-router-dom";
 
-
 const Allresumes = () => {
   const [resumeData, setResumeData] = useState([]);
-  const [duplicateData, setDuplicatesData] = useState([]);
+  const [duplicateData, setDuplicateData] = useState([]);
   const [searchVal, setSearchVal] = useState("");
+
   useEffect(() => {
     getResumeDatas();
   }, []);
 
   const getResumeDatas = async () => {
     try {
-      const apiResponse = await getResumes();
-
-      console.log("Full API response:", apiResponse);
-      console.log("Resume records:", apiResponse.data);
-      setResumeData(apiResponse.data);
-      setDuplicatesData(apiResponse.data);
+      const response = await getResumes();
+      setResumeData(response.data);
+      setDuplicateData(response.data);
     } catch (error) {
-      console.log("API error:", error);
-      toast.error("Failed to get resume data");
+      toast.error("Failed to get resumes");
     }
   };
 
+  // Search
+  useEffect(() => {
+    const filteredData = duplicateData.filter((item) =>
+      item.jobTitle.toLowerCase().includes(searchVal.toLowerCase())
+    );
+
+    setResumeData(filteredData);
+  }, [searchVal, duplicateData]);
+
+  // Delete
   const onDeleteClick = async (id) => {
     try {
-      let apiResponse = await deleteResume(id);
-      if (apiResponse.status == 200) {
-        toast.success("successfully deleted");
-        getResumeDatas()
+      const response = await deleteResume(id);
+
+      if (response.status === 200) {
+        toast.success("Resume deleted");
+        getResumeDatas();
       } else {
-        toast.error("Failed");
+        toast.error("Failed to delete");
       }
     } catch (error) {
-      console.log("API error:", error);
-      toast.error("Failed to delete resume ");
+      toast.error("Failed to delete resume");
     }
   };
 
-  const onSearchClick = useMemo(() => {
-    let filteredData = duplicateData.filter((eachData) =>
-      eachData.jobTitle.toLowerCase().includes(searchVal.toLowerCase()),
-    )
-    setResumeData(filteredData)
-  }, [searchVal])
-
-  const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: theme.palette.common.black,
-      color: theme.palette.common.white,
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: 14,
-    },
-  }));
-
-  const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    "&:nth-of-type(odd)": {
-      backgroundColor: theme.palette.action.hover,
-    },
-    "&:last-child td, &:last-child th": {
-      border: 0,
-    },
-  }));
-
   return (
-    <Box sx={{ padding: "30px 100px" }}>
-      <Typography
-        variant="h4"
-        sx={{
-          textAlign: "center",
-          fontWeight: "bold",
-          marginBottom: "65px",
-        }}
-      >
+    <Box sx={{ p: 4 }}>
+      <Typography variant="h4" textAlign="center" mb={4}>
         All Saved Resumes
       </Typography>
 
-      <Typography sx={{ marginBottom: "55px", lineHeight: 1.7 }}>
-        All resumes submitted to the platform in one place, allowing
-        administrators or recruiters to efficiently view, search, filter, and
-        manage candidate profiles. It provides a quick overview of available
-        candidates and their key details, making the recruitment and
-        candidate-selection process more organized and efficient.
-      </Typography>
+      <TextField
+        fullWidth
+        size="small"
+        placeholder="Search by Job Role"
+        value={searchVal}
+        onChange={(e) => setSearchVal(e.target.value)}
+        sx={{ mb: 3 }}
+      />
 
-      <Box sx={{ display: "flex", justifyContent: "center", mb: 6 }}>
-        <TextField
-          onChange={(e) => setSearchVal(e.target.value)}
-          placeholder="Search Candidate by their Job Roles"
-          sx={{ width: "60%" }}
-          size="small"
-        />
-      </Box>
+      <table width="100%" cellPadding="12">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Resume</th>
+            <th>Job Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
 
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 700 }} aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell>#</StyledTableCell>
-              <StyledTableCell align="right">Resume</StyledTableCell>
-              <StyledTableCell align="right">Job Role</StyledTableCell>
-              <StyledTableCell align="right">...</StyledTableCell>
-            </TableRow>
-          </TableHead>
+        <tbody>
+          {resumeData.map((item, index) => (
+            <tr key={item.id}>
+              <td>{index + 1}</td>
+              <td>{item.fullName}</td>
+              <td>{item.jobTitle}</td>
+              <td>
+                <button onClick={() => onDeleteClick(item.id)}>
+                  <BiTrash style={{ color: "red" }} />
+                </button>
 
-          <TableBody>
-            {resumeData.map((eachData, index) => (
-              <StyledTableRow key={index}>
-                <StyledTableCell component="th" scope="row">
-                  {index + 1}
-                </StyledTableCell>
-
-                <StyledTableCell align="right">
-                  {eachData?.fullName}
-                </StyledTableCell>
-
-                <StyledTableCell align="right">
-                  {eachData?.jobTitle}
-                </StyledTableCell>
-
-                <StyledTableCell align="right">
-                  <button onClick={() => onDeleteClick(eachData.id)}>
-                    <BiTrash
-                      style={{
-                        color: "red",
-                        fontSize: "22px",
-                        cursor: "pointer",
-                      }}
-                    />
-                  </button>
-                  <Link to={`/resumes/${eachData?.id}`}>
-  <button>Show Details</button>
-</Link>
-                </StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                <Link to={`/resumes/${item.id}`}>
+                  <button>Show Details</button>
+                </Link>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </Box>
   );
 };
